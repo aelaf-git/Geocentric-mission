@@ -1,0 +1,192 @@
+%General Mission Analysis Tool(GMAT) Script
+%Created: 2025-06-27 17:52:06
+
+
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+
+Create Spacecraft AelafSat1;
+AelafSat1.DateFormat = TAIModJulian;
+AelafSat1.Epoch = '21545';
+AelafSat1.CoordinateSystem = EarthMJ2000Eq;
+AelafSat1.DisplayStateType = Cartesian;
+AelafSat1.X = 7100;
+AelafSat1.Y = 0;
+AelafSat1.Z = 1300;
+AelafSat1.VX = 0;
+AelafSat1.VY = 7.35;
+AelafSat1.VZ = 1;
+AelafSat1.DryMass = 850;
+AelafSat1.Cd = 2.2;
+AelafSat1.Cr = 1.8;
+AelafSat1.DragArea = 15;
+AelafSat1.SRPArea = 1;
+AelafSat1.SPADDragScaleFactor = 1;
+AelafSat1.SPADSRPScaleFactor = 1;
+AelafSat1.AtmosDensityScaleFactor = 1;
+AelafSat1.ExtendedMassPropertiesModel = 'None';
+AelafSat1.NAIFId = -10001001;
+AelafSat1.NAIFIdReferenceFrame = -9001001;
+AelafSat1.OrbitColor = Red;
+AelafSat1.TargetColor = Teal;
+AelafSat1.OrbitErrorCovariance = [ 1e+70 0 0 0 0 0 ; 0 1e+70 0 0 0 0 ; 0 0 1e+70 0 0 0 ; 0 0 0 1e+70 0 0 ; 0 0 0 0 1e+70 0 ; 0 0 0 0 0 1e+70 ];
+AelafSat1.CdSigma = 1e+70;
+AelafSat1.CrSigma = 1e+70;
+AelafSat1.Id = 'SatId';
+AelafSat1.Attitude = CoordinateSystemFixed;
+AelafSat1.SPADSRPInterpolationMethod = Bilinear;
+AelafSat1.SPADSRPScaleFactorSigma = 1e+70;
+AelafSat1.SPADDragInterpolationMethod = Bilinear;
+AelafSat1.SPADDragScaleFactorSigma = 1e+70;
+AelafSat1.AtmosDensityScaleFactorSigma = 1e+70;
+AelafSat1.ModelFile = 'aura.3ds';
+AelafSat1.ModelOffsetX = 0;
+AelafSat1.ModelOffsetY = 0;
+AelafSat1.ModelOffsetZ = 0;
+AelafSat1.ModelRotationX = 0;
+AelafSat1.ModelRotationY = 0;
+AelafSat1.ModelRotationZ = 0;
+AelafSat1.ModelScale = 1;
+AelafSat1.AttitudeDisplayStateType = 'Quaternion';
+AelafSat1.AttitudeRateDisplayStateType = 'AngularVelocity';
+AelafSat1.AttitudeCoordinateSystem = EarthMJ2000Eq;
+AelafSat1.EulerAngleSequence = '321';
+
+%----------------------------------------
+%---------- ForceModels
+%----------------------------------------
+
+Create ForceModel DefaultProp_ForceModel;
+DefaultProp_ForceModel.CentralBody = Earth;
+DefaultProp_ForceModel.PrimaryBodies = {Earth};
+DefaultProp_ForceModel.Drag = None;
+DefaultProp_ForceModel.SRP = Off;
+DefaultProp_ForceModel.RelativisticCorrection = Off;
+DefaultProp_ForceModel.ErrorControl = RSSStep;
+DefaultProp_ForceModel.GravityField.Earth.Degree = 4;
+DefaultProp_ForceModel.GravityField.Earth.Order = 4;
+DefaultProp_ForceModel.GravityField.Earth.StmLimit = 100;
+DefaultProp_ForceModel.GravityField.Earth.PotentialFile = 'JGM2.cof';
+DefaultProp_ForceModel.GravityField.Earth.TideModel = 'None';
+
+%----------------------------------------
+%---------- Propagators
+%----------------------------------------
+
+Create Propagator DefaultProp;
+DefaultProp.FM = DefaultProp_ForceModel;
+DefaultProp.Type = RungeKutta89;
+DefaultProp.InitialStepSize = 60;
+DefaultProp.Accuracy = 9.999999999999999e-12;
+DefaultProp.MinStep = 0.001;
+DefaultProp.MaxStep = 2700;
+DefaultProp.MaxStepAttempts = 50;
+DefaultProp.StopIfAccuracyIsViolated = true;
+
+%----------------------------------------
+%---------- Burns
+%----------------------------------------
+
+Create ImpulsiveBurn TOI;
+TOI.CoordinateSystem = Local;
+TOI.Origin = Earth;
+TOI.Axes = VNB;
+TOI.Element1 = 0;
+TOI.Element2 = 0;
+TOI.Element3 = 0;
+TOI.DecrementMass = false;
+TOI.Isp = 300;
+TOI.GravitationalAccel = 9.81;
+
+Create ImpulsiveBurn GOI;
+GOI.CoordinateSystem = Local;
+GOI.Origin = Earth;
+GOI.Axes = VNB;
+GOI.Element1 = 0;
+GOI.Element2 = 0;
+GOI.Element3 = 0;
+GOI.DecrementMass = false;
+GOI.Isp = 300;
+GOI.GravitationalAccel = 9.81;
+
+%----------------------------------------
+%---------- Solvers
+%----------------------------------------
+
+Create DifferentialCorrector DC1;
+DC1.ShowProgress = true;
+DC1.ReportStyle = Normal;
+DC1.ReportFile = 'DifferentialCorrectorDC1.data';
+DC1.MaximumIterations = 25;
+DC1.DerivativeMethod = ForwardDifference;
+DC1.Algorithm = NewtonRaphson;
+
+%----------------------------------------
+%---------- Subscribers
+%----------------------------------------
+
+Create OrbitView DefaultOrbitView;
+DefaultOrbitView.SolverIterations = Current;
+DefaultOrbitView.UpperLeft = [ 0 0 ];
+DefaultOrbitView.Size = [ 0 0 ];
+DefaultOrbitView.RelativeZOrder = 0;
+DefaultOrbitView.Maximized = false;
+DefaultOrbitView.Add = {AelafSat1, Earth};
+DefaultOrbitView.CoordinateSystem = EarthMJ2000Eq;
+DefaultOrbitView.DrawObject = [ true true ];
+DefaultOrbitView.DataCollectFrequency = 1;
+DefaultOrbitView.UpdatePlotFrequency = 50;
+DefaultOrbitView.NumPointsToRedraw = 0;
+DefaultOrbitView.ShowPlot = true;
+DefaultOrbitView.MaxPlotPoints = 20000;
+DefaultOrbitView.ShowLabels = true;
+DefaultOrbitView.ViewPointReference = Earth;
+DefaultOrbitView.ViewPointVector = [ 0 0 120000 ];
+DefaultOrbitView.ViewDirection = Earth;
+DefaultOrbitView.ViewScaleFactor = 1;
+DefaultOrbitView.ViewUpCoordinateSystem = EarthMJ2000Eq;
+DefaultOrbitView.ViewUpAxis = X;
+DefaultOrbitView.EclipticPlane = Off;
+DefaultOrbitView.XYPlane = On;
+DefaultOrbitView.WireFrame = Off;
+DefaultOrbitView.Axes = On;
+DefaultOrbitView.Grid = Off;
+DefaultOrbitView.SunLine = Off;
+DefaultOrbitView.UseInitialView = On;
+DefaultOrbitView.StarCount = 7000;
+DefaultOrbitView.EnableStars = On;
+DefaultOrbitView.EnableConstellations = On;
+
+Create GroundTrackPlot DefaultGroundTrackPlot;
+DefaultGroundTrackPlot.SolverIterations = Current;
+DefaultGroundTrackPlot.UpperLeft = [ 0 0 ];
+DefaultGroundTrackPlot.Size = [ 0 0 ];
+DefaultGroundTrackPlot.RelativeZOrder = 0;
+DefaultGroundTrackPlot.Maximized = false;
+DefaultGroundTrackPlot.Add = {AelafSat1};
+DefaultGroundTrackPlot.DataCollectFrequency = 1;
+DefaultGroundTrackPlot.UpdatePlotFrequency = 50;
+DefaultGroundTrackPlot.NumPointsToRedraw = 0;
+DefaultGroundTrackPlot.ShowPlot = true;
+DefaultGroundTrackPlot.MaxPlotPoints = 20000;
+DefaultGroundTrackPlot.CentralBody = Earth;
+DefaultGroundTrackPlot.TextureMap = 'ModifiedBlueMarble.jpg';
+
+
+%----------------------------------------
+%---------- Mission Sequence
+%----------------------------------------
+
+BeginMissionSequence;
+Propagate 'Prop To Periapsis' DefaultProp(AelafSat1) {AelafSat1.Earth.Periapsis};
+Target 'Hohmann Transfer' DC1 {SolveMode = Solve, ExitMode = DiscardAndContinue, ShowProgressWindow = true};
+   Vary 'Vary TOI' DC1(TOI.Element1 = 1, {Perturbation = 0.0001, Lower = 0.0, Upper = 3.14159, MaxStep = 0.5, AdditiveScaleFactor = 0.0, MultiplicativeScaleFactor = 1.0});
+   Maneuver 'Perform TOI' TOI(AelafSat1);
+   Propagate 'Prop To Apoapsis' DefaultProp(AelafSat1) {AelafSat1.Earth.Apoapsis};
+   Achieve 'Achieve RMAG = 42165' DC1(AelafSat1.Earth.RMAG = 42164.169, {Tolerance = 0.1});
+   Vary 'Vary GOI' DC1(GOI.Element1 = 1, {Perturbation = 0.0001, Lower = 0.0, Upper = 3.14159, MaxStep = 0.2, AdditiveScaleFactor = 0.0, MultiplicativeScaleFactor = 1.0});
+   Maneuver 'Perform GOI' GOI(AelafSat1);
+   Achieve 'Achieve ECC = 0.005' DC1(AelafSat1.Earth.ECC = 0.005, {Tolerance = 0.0001});
+EndTarget;  % For targeter DC1
+Propagate 'Prop One Day' DefaultProp(AelafSat1) {AelafSat1.ElapsedSecs = 86400};
