@@ -31,10 +31,11 @@ This project is part of a broader interest in simulating and visualizing spacecr
 3. Open `index.html` in a modern web browser with internet access.
 
 ## 📸 Screenshots
-_Add screenshots here if available._
+
+![GmatScreenShot_005](https://github.com/user-attachments/assets/47e25401-c82c-4551-8ecc-b7021fb245ab)
 
 ## 🌐 Live Demo
-_Set up with GitHub Pages or similar to enable live viewing._
+https://aelaf-git.github.io/Geocentric-mission/
 
 ---
 
